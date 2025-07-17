@@ -25,6 +25,7 @@ jobs:
 
     - name: Build .app with py2app
       run: |
+        set -x
         python3 setup.py py2app
 
     - name: Create .dmg
