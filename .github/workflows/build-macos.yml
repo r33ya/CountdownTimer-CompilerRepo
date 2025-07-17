@@ -1,0 +1,58 @@
+name: Build macOS App
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install Python dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install py2app pygame pyobjc
+
+    - name: Build .app with py2app
+      run: |
+        python3 setup.py py2app
+
+    - name: Code sign the .app (optional)
+      if: ${{ secrets.MAC_CERTIFICATE_P12 }}
+      env:
+        CODESIGN_IDENTITY: "Developer ID Application: Your Name (TEAMID)"  # 修改为你的签名身份
+      run: |
+        codesign --deep --force --options runtime \
+          --entitlements entitlements.plist \
+          --sign "$CODESIGN_IDENTITY" \
+          dist/CountdownTimer.app
+        codesign --verify --verbose dist/CountdownTimer.app
+
+    - name: Create .dmg
+      run: |
+        hdiutil create CountdownTimer.dmg \
+          -volname CountdownTimer \
+          -srcfolder dist/CountdownTimer.app \
+          -ov -format UDZO
+
+    - name: Upload .app as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CountdownTimer-app
+        path: dist/CountdownTimer.app
+
+    - name: Upload .dmg as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: CountdownTimer-dmg
+        path: CountdownTimer.dmg
