@@ -22,8 +22,7 @@ jobs:
       - name: Upgrade pip and install dependencies
         run: |
           python -m pip install --upgrade pip setuptools wheel
-          pip install -r requirements.txt
-          pip install py2app
+          pip install py2app pyobjc pygame
 
       - name: Build app with py2app
         run: |
