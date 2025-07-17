@@ -27,17 +27,6 @@ jobs:
       run: |
         python3 setup.py py2app
 
-    - name: Code sign the .app (optional)
-      if: ${{ secrets.MAC_CERTIFICATE_P12 }}
-      env:
-        CODESIGN_IDENTITY: "Developer ID Application: Your Name (TEAMID)"  # 修改为你的签名身份
-      run: |
-        codesign --deep --force --options runtime \
-          --entitlements entitlements.plist \
-          --sign "$CODESIGN_IDENTITY" \
-          dist/CountdownTimer.app
-        codesign --verify --verbose dist/CountdownTimer.app
-
     - name: Create .dmg
       run: |
         hdiutil create CountdownTimer.dmg \
