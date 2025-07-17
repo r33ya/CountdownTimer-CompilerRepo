@@ -1,6 +1,6 @@
 from setuptools import setup
 
-APP = ['app.py']
+APP = ['countdown_timer/app.py']
 DATA_FILES = []
 OPTIONS = {
     'argv_emulation': True,
