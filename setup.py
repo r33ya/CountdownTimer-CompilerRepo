@@ -5,6 +5,7 @@ DATA_FILES = []
 OPTIONS = {
     'argv_emulation': True,
     'packages': ['pygame'],
+    'iconfile': 'resources/app_icon.icns',
     'plist': {
         'NSAppTransportSecurity': {
             'NSAllowsArbitraryLoads': True
