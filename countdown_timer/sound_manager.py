@@ -24,9 +24,12 @@ class SoundManager:
         else:
             raise ValueError("文件不存在")
 
-    def play_sound(self):
+    def play_sound_loop(self):
         pygame.mixer.music.load(self.current_sound)
-        pygame.mixer.music.play()
+        pygame.mixer.music.play(loops=-1)
+
+    def stop_sound(self):
+        pygame.mixer.music.stop()
 
     def set_sound(self, sound_path):
         if os.path.exists(sound_path):

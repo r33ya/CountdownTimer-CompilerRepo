@@ -17,7 +17,21 @@ class CountdownApp:
         self.countdown.set_timer_complete_callback(self.on_timer_complete)
 
     def on_timer_complete(self):
-        self.sound_manager.play_sound()
+        # 1. 循环播放铃声
+        self.sound_manager.play_sound_loop()
+
+        # 2. 发送macOS通知
+        notification = NSUserNotification.alloc().init()
+        notification.setTitle_("倒计时结束")
+        notification.setInformativeText_("时间到！点击关闭通知停止铃声。")
+        notification.setSoundName_(None)
+        notification.setHasActionButton_(True)
+        notification.setActionButtonTitle_("关闭铃声")
+
+        # 3. 设置通知回调
+        center = NSUserNotificationCenter.defaultUserNotificationCenter()
+        center.setDelegate_(self.app_delegate)
+        center.deliverNotification_(notification)
 
     def run(self):
         app = NSApplication.sharedApplication()
@@ -34,6 +48,10 @@ class AppDelegate(NSObject):
         self.time_label = None
         self.start_button = None
         self.choose_sound_button = None
+    # 通知被激活或关闭时的回调
+    def userNotificationCenter_didActivateNotification_(self, center, notification):
+        # 用户点击了通知或关闭了通知，停止铃声
+        self.sound_manager.stop_sound()
 
     def applicationDidFinishLaunching_(self, notification):
         self.create_window()
