@@ -1,47 +1,38 @@
-name: Build macOS App
+name: Build macOS app
 
 on:
   push:
-    branches: [main]
-  workflow_dispatch:
+    branches:
+      - main
+  pull_request:
 
 jobs:
-  build-macos:
+  build-macos-app:
     runs-on: macos-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-    - name: Install Python dependencies
-      run: |
-        python3 -m pip install --upgrade pip
-        pip install py2app pygame pyobjc
+      - name: Upgrade pip and install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install py2app pyobjc pygame
 
-    - name: Build .app with py2app
-      run: |
-        python3 setup.py py2app
+      - name: Build app with py2app
+        run: |
+          python setup.py py2app
 
-    - name: Create .dmg
-      run: |
-        hdiutil create CountdownTimer.dmg \
-          -volname CountdownTimer \
-          -srcfolder dist/CountdownTimer.app \
-          -ov -format UDZO
+      - name: Show build output files
+        run: ls -l dist/
 
-    - name: Upload .app as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: CountdownTimer-app
-        path: dist/CountdownTimer.app
-
-    - name: Upload .dmg as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: CountdownTimer-dmg
-        path: CountdownTimer.dmg
+      - name: Upload .app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CountdownTimer-macOS-App
+          path: dist/*.app
